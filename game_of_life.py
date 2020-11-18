@@ -75,6 +75,7 @@ def main():
     clock = Clock()
 
     while run:
+        # framerate
         clock.tick(7)
         keys = pygame.key.get_pressed()
 
@@ -82,6 +83,7 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
 
+            # press mouse button to make a cell alive or dead(to set the seed)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 gridpos = grid[get_pos()[0] // rez][get_pos()[1] // rez]
                 if gridpos == 0:
@@ -89,6 +91,7 @@ def main():
                 elif gridpos == 1:
                     grid[get_pos()[0] // rez][get_pos()[1] // rez] = 0
 
+        # hold space to run the simulation
         if keys[pygame.K_SPACE]:
             gen = []
             for i in range(width // rez):
