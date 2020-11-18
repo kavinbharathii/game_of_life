@@ -7,8 +7,8 @@ import numpy as np
 
 # -------------------------------------------------------------------------------------------------------------------------#
 width = 600
-height = 600
-rez = 40
+height = 400
+rez = 20
 white = (255, 255, 255)
 black = (0, 0, 0)
 grey = (169, 169, 169)
@@ -75,7 +75,8 @@ def main():
     clock = Clock()
 
     while run:
-        clock.tick(5)
+        clock.tick(7)
+        keys = pygame.key.get_pressed()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -88,32 +89,31 @@ def main():
                 elif gridpos == 1:
                     grid[get_pos()[0] // rez][get_pos()[1] // rez] = 0
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    gen = []
-                    for i in range(width // rez):
-                        gen.append([])
-                        for j in range(height // rez):
-                            gen[i].append(0)
+        if keys[pygame.K_SPACE]:
+            gen = []
+            for i in range(width // rez):
+                gen.append([])
+                for j in range(height // rez):
+                    gen[i].append(0)
 
-                    for i in range(len(gen)):
-                        for j in range(len(gen[0])):
+            for i in range(len(gen)):
+                for j in range(len(gen[0])):
 
-                            if (i == 0 or i == cols - 1 or j == 0 or j == rows - 1):
-                                gen[i][j] = 0
+                    if (i == 0 or i == cols - 1 or j == 0 or j == rows - 1):
+                        gen[i][j] = 0
 
-                            else:
-                                state = grid[i][j]
-                                neighbours = count_neighbours(grid, i, j)
+                    else:
+                        state = grid[i][j]
+                        neighbours = count_neighbours(grid, i, j)
 
-                                if (state == 0 and neighbours == 3):
-                                    gen[i][j] = 1
-                                elif (state == 1 and (neighbours < 2 or neighbours > 3)):
-                                    gen[i][j] = 0
-                                else:
-                                    gen[i][j] = state
+                        if (state == 0 and neighbours == 3):
+                            gen[i][j] = 1
+                        elif (state == 1 and (neighbours < 2 or neighbours > 3)):
+                            gen[i][j] = 0
+                        else:
+                            gen[i][j] = state
 
-                    grid = gen
+            grid = gen
 
         draw_cells()
         draw_grid()
