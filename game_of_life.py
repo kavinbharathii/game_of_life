@@ -108,6 +108,11 @@ def main():
                 if event.key == pygame.K_r:
                     reset()
 
+                if event.key == pygame.K_q:
+                    pygame.display.quit()
+                    pygame.quit()
+                    quit()
+
         if keys[pygame.K_SPACE]:
             gen = []
             for i in range(width // rez):
