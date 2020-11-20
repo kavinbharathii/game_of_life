@@ -1,3 +1,9 @@
+# John Conway's Game Of life.
+# A simulation of cells in a 2D grid
+# driven by a set of rules...
+
+# -------------------------------------------------------------------------------------------------------------------------#
+
 import pygame
 from pygame.draw import line, rect
 from pygame.time import Clock
@@ -48,6 +54,14 @@ def set_grid():
 # -------------------------------------------------------------------------------------------------------------------------#
 
 
+def reset():
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            grid[i][j] = 0
+
+# -------------------------------------------------------------------------------------------------------------------------#
+
+
 def draw_cells():
     for i in range(len(grid)):
         for j in range(len(grid[0])):
@@ -73,9 +87,9 @@ def main():
     global grid
     run = True
     clock = Clock()
+    set_grid()
 
     while run:
-        # framerate
         clock.tick(7)
         keys = pygame.key.get_pressed()
 
@@ -83,7 +97,6 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
 
-            # press mouse button to make a cell alive or dead(to set the seed)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 gridpos = grid[get_pos()[0] // rez][get_pos()[1] // rez]
                 if gridpos == 0:
@@ -91,7 +104,10 @@ def main():
                 elif gridpos == 1:
                     grid[get_pos()[0] // rez][get_pos()[1] // rez] = 0
 
-        # hold space to run the simulation
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    reset()
+
         if keys[pygame.K_SPACE]:
             gen = []
             for i in range(width // rez):
