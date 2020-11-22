@@ -33,6 +33,8 @@ for i in range(width // rez):
     grid.append([])
     for j in range(height // rez):
         grid[i].append(0)
+        
+#grid = np.zeros(shape = (width // rez, height // rez))
 
 # -------------------------------------------------------------------------------------------------------------------------#
 
