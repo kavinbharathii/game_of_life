@@ -1,154 +1,89 @@
-# John Conway's Game Of life.
-# A simulation of cells in a 2D grid
-# driven by a set of rules...
 
-# -------------------------------------------------------------------------------------------------------------------------#
-
-import pygame
-from pygame.draw import line, rect
-from pygame.time import Clock
-from pygame.mouse import get_pos
 import random
-import numpy as np
+import pygame
+pygame.init()
 
-# -------------------------------------------------------------------------------------------------------------------------#
-width = 600
-height = 400
-rez = 20
-white = (255, 255, 255)
-black = (0, 0, 0)
-grey = (169, 169, 169)
-cols = width // rez
-rows = height // rez
-# -------------------------------------------------------------------------------------------------------------------------#
-
+width = 900
+height = 600
+rez = 18
 display = pygame.display.set_mode((width, height))
-pygame.display.set_caption('Game Of LIfe')
+pygame.display.set_caption("Game Of Life")
+dirs = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
 
-# -------------------------------------------------------------------------------------------------------------------------#
+def draw_board(board):
+    for r in range(len(board)):
+        for c in range(len(board[0])):
+            if board[r][c] == 1:
+                pygame.draw.rect(display, (220, 220, 220), (c * rez, r * rez, rez, rez))
+            else:
+                pygame.draw.rect(display, (0, 0, 0), (c * rez, r * rez, rez, rez), 2)
 
-grid = []
+def gol(board):
+    next_gen = [[0 for _ in range(width // rez)] for _ in range(height // rez)]
+    for r in range(1, len(board) - 1):
+        for c in range(1, len(board[0]) - 1):
+            neighbors = 0
+            state = board[r][c]
 
-for i in range(width // rez):
-    grid.append([])
-    for j in range(height // rez):
-        grid[i].append(0)
-        
-#grid = np.zeros(shape = (width // rez, height // rez))
+            for dr, dc in dirs:
+                neighbors += board[r + dr][c + dc]
 
-# -------------------------------------------------------------------------------------------------------------------------#
+            if (neighbors == 3) and (state == 0):
+                next_gen[r][c] = 1
 
+            elif (neighbors > 3 or neighbors < 2) and state == 1:
+                next_gen[r][c] = 0
 
-def draw_grid():
-    for i in range(1, width // rez):
-        for j in range(1, height // rez):
-            line(display, white, (i * rez, 0), (i * rez, height))
-            line(display, white, (0, j * rez), (width, j * rez))
+            else:
+                next_gen[r][c] = state
 
-# -------------------------------------------------------------------------------------------------------------------------#
-
-
-def set_grid():
-    for i in range(len(grid)):
-        for j in range(len(grid[0])):
-            grid[i][j] = random.randint(0, 1)
-
-# -------------------------------------------------------------------------------------------------------------------------#
-
-
-def reset():
-    for i in range(len(grid)):
-        for j in range(len(grid[0])):
-            grid[i][j] = 0
-
-# -------------------------------------------------------------------------------------------------------------------------#
-
-
-def draw_cells():
-    for i in range(len(grid)):
-        for j in range(len(grid[0])):
-            rect(display, (220 * grid[i][j], 220 * grid[i][j],
-                           220 * grid[i][j]), (i * rez, j * rez, rez, rez))
-
-# -------------------------------------------------------------------------------------------------------------------------#
-
-
-def count_neighbours(arr, x, y):
-    total = 0
-    for i in range(-1, 2):
-        for j in range(-1, 2):
-            total += int(arr[x + i][y + j])
-
-    total -= int(arr[x][y])
-    return total
-
-# -------------------------------------------------------------------------------------------------------------------------#
-
+    return next_gen
 
 def main():
-    global grid
-    run = True
-    clock = Clock()
-    set_grid()
+    loop = True
+    board = [[0 for _ in range(width // rez)] for _ in range(height // rez)]
 
-    while run:
-        clock.tick(7)
-        keys = pygame.key.get_pressed()
+    # plane
+    board[5][5] = 1
+    board[6][6] = 1
+    board[7][4] = 1
+    board[7][5] = 1
+    board[7][6] = 1
 
+
+
+    clock = pygame.time.Clock()
+    toggle = False
+
+    while loop:
+        clock.tick(10)
+        display.fill((20, 20, 20))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                loop = False
+                # quit()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                gridpos = grid[get_pos()[0] // rez][get_pos()[1] // rez]
-                if gridpos == 0:
-                    grid[get_pos()[0] // rez][get_pos()[1] // rez] = 1
-                elif gridpos == 1:
-                    grid[get_pos()[0] // rez][get_pos()[1] // rez] = 0
+                (y, x) = pygame.mouse.get_pos()
+                y = y // rez
+                x = x // rez
+
+                board[x][y] = 1 if board[x][y] == 0 else 0
 
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    toggle = not toggle
+
                 if event.key == pygame.K_r:
-                    reset()
+                    board = [[0 for _ in range(width // rez)] for _ in range(height // rez)]
 
-                if event.key == pygame.K_q:
-                    pygame.display.quit()
-                    pygame.quit()
-                    quit()
+        if toggle:
+            board = gol(board)
 
-        if keys[pygame.K_SPACE]:
-            gen = []
-            for i in range(width // rez):
-                gen.append([])
-                for j in range(height // rez):
-                    gen[i].append(0)
-
-            for i in range(len(gen)):
-                for j in range(len(gen[0])):
-
-                    if (i == 0 or i == cols - 1 or j == 0 or j == rows - 1):
-                        gen[i][j] = 0
-
-                    else:
-                        state = grid[i][j]
-                        neighbours = count_neighbours(grid, i, j)
-
-                        if (state == 0 and neighbours == 3):
-                            gen[i][j] = 1
-                        elif (state == 1 and (neighbours < 2 or neighbours > 3)):
-                            gen[i][j] = 0
-                        else:
-                            gen[i][j] = state
-
-            grid = gen
-
-        draw_cells()
-        draw_grid()
+        draw_board(board)
         pygame.display.flip()
 
-
-# -------------------------------------------------------------------------------------------------------------------------#
 
 if __name__ == "__main__":
     main()
 
-# -------------------------------------------------------------------------------------------------------------------------#
